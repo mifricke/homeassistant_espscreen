@@ -43,7 +43,7 @@ substitutions:
   LVGL_BUFFER_SIZE: "25%"                       # LVGL's draw buffer as a share of the screen
 
   # Hardware a screen's own YAML may change (docs/EASY_SETUP.md, "Hardware-specific YAML overrides")
-  BACKLIGHT_FREQUENCY: "150Hz"                  # the backlight's PWM; see the output block (GitHub #5)
+  BACKLIGHT_FREQUENCY: "20000Hz"                # the backlight's PWM, 20 kHz above the audible range; see the output block (GitHub #5)
 
 # ============================================================
 # No need to edit below this line.
