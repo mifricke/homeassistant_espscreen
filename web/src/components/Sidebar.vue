@@ -176,6 +176,9 @@ const lastLog = () => {
           <!-- Folded, the row keeps its news as a dot on the icon: an update ready, or one that waits. -->
           <span v-if="sidebar.folded && ['update', 'waiting'].includes(status(screen))" class="fold-badge" :class="status(screen)" aria-hidden="true"></span>
           <span class="name">{{ screen.name }}</span>
+          <!-- Whether the screen is reachable, as a dot behind its name: green online, red offline. -->
+          <span v-if="!screen.virtual" class="online-dot" :class="screen.online ? 'on' : 'off'" role="img"
+            :aria-label="t(screen.online ? 'editor.common.online' : 'editor.common.offline')" :title="t(screen.online ? 'editor.common.online' : 'editor.common.offline')"></span>
           <span v-if="screen.id === scr.selected && doc.dirty" class="unsaved" role="img" :aria-label="t('editor.common.unsaved')" :title="t('editor.common.unsaved')"></span>
           <ProgressRing v-if="status(screen) === 'running'" class="row-ring" :percent="builds.buildProgress(screen)?.percent ?? 0" :label="subline(screen)?.text || ''" />
           <Icon v-else-if="status(screen) === 'failed'" name="alert-circle-outline" class="sub-icon failed" />
