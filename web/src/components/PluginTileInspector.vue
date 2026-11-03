@@ -14,7 +14,7 @@ import NameField from "./inspector/NameField.vue";
 import TitleButton from "./inspector/TitleButton.vue";
 import PropRow from "./ui/PropRow.vue";
 import Section from "./ui/Section.vue";
-import UiSelect from "./ui/UiSelect.vue";
+import UiPicker from "./ui/UiPicker.vue";
 import { usePluginsStore } from "../stores/plugins";
 import { removeTile, setTileOption } from "../editor/tiles";
 import { useUiStore } from "../stores/ui";
@@ -32,9 +32,13 @@ function set(option: PluginTileOption, value: PluginValue) {
   setTileOption(props.tile, "plugin", { ...(props.tile.options?.plugin || {}), [option.id]: value });
 }
 // A tile that belongs to an entity (its manifest's `domains`): the entities of those domains, only those with the
-// attributes it needs when its manifest names them (`has_attributes`).
-const entityChoices = computed(() => offeredEntities(plugins.entitiesIn(kind.value.tile.domains), kind.value.tile, props.tile.options?.plugin_entity)
-  .map((e) => [e.id, e.name !== e.id ? `${e.name} (${e.id})` : e.id] as [string, string]));
+// attributes it needs when its manifest names them (`has_attributes`), in a list that searches as the person types.
+const entityChoices = computed(() => offeredEntities(plugins.entitiesIn(kind.value.tile.domains), kind.value.tile, props.tile.options?.plugin_entity));
+const entityName = computed(() => {
+  const id = props.tile.options?.plugin_entity || "";
+  return entityChoices.value.find((e) => e.id === id)?.name || id || t("editor.plugin_tile.choose");
+});
+const setEntity = (value: string) => setTileOption(props.tile, "plugin_entity", value);
 const size = (value: string) => value.replace("x", "×");
 // Its entity gone from Home Assistant, or away for a while (stores/broken.ts): said under the choice of another.
 const broken = useBrokenStore();
@@ -54,9 +58,15 @@ function openPlugin() { insp.closeInspector(); ui.tab = "plugins"; }
       <button type="button" class="btn link mini" @click="openPlugin">{{ t("editor.plugin_tile.details") }}</button></p>
 
     <Section v-if="kind.tile.domains?.length" :title="t('editor.plugin_tile.entity')">
-      <PropRow :label="t('editor.plugin_tile.entity')" icon="link-variant" for="plugin-entity">
-        <UiSelect id="plugin-entity" :model-value="tile.options?.plugin_entity || ''" :options="entityChoices"
-          :placeholder="t('editor.plugin_tile.choose')" @update:model-value="(value: string) => setTileOption(tile, 'plugin_entity', value)" />
+      <PropRow :label="t('editor.plugin_tile.entity')" icon="link-variant" for="plugin-entity" stack>
+        <UiPicker id="plugin-entity" :items="entityChoices" :placeholder="t('editor.plugin_tile.search')"
+          :empty="t('editor.plugin_tile.none_found')" @pick="setEntity">
+          <template #trigger>
+            <button type="button" class="ghost-btn" id="plugin-entity-choose"><Icon name="magnify" />{{ entityName }}</button>
+          </template>
+        </UiPicker>
+        <button v-if="tile.options?.plugin_entity" type="button" class="btn quiet mini"
+          :aria-label="t('editor.plugin_tile.remove', { name: entityName })" @click="setEntity('')"><Icon name="close" /></button>
         <template v-if="entityHealth" #note><small class="help warn" id="plugin-entity-broken">{{ healthText(entityHealth, ui.now) }}</small></template>
       </PropRow>
     </Section>
