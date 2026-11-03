@@ -1,3 +1,7 @@
+## Unreleased
+
+- **A screen's row says whether it is online.** In the list of screens a green dot behind the name shows a screen that
+  is online, a red one a screen that is offline.
 ## 0.4.93 (firmware 0.59.0)
 
 - **A camera opens full screen at once again from its live tile.** Since 0.4.91 a tap on a live tile took about 11 seconds to show the camera full screen: its first try went out without an address while the tile's own stream was still ending, and the second came 10 seconds later.
